@@ -29,9 +29,6 @@ class Deck(Card):
     def remove_card(self):
         return self.all_cards.pop(0) 
 
-    #def add_hand(self, deck):
-        #return sum(deck)
-
  
 
 class Player(Deck, Card):
@@ -44,7 +41,7 @@ class Player(Deck, Card):
     def __str__(self):
         return f"You have ${self.balance}."
 
-    def hit(self, new_card):
+    def player_hit(self, new_card):
         self.my_cards.append(new_card)
         self.values.append(new_card.value)
         
@@ -65,19 +62,22 @@ class Player(Deck, Card):
                     break
     
    
-                
-        
-        
-
-'''
+                       
 class Dealer(Deck):
-    def __init__(self)
+    def __init__(self):
+        self.dealer_cards = []
+        self.dealer_values = []
 
-'''
+    def dealer_hit(self, new_card):
+        self.dealer_cards.append(new_card)
+        self.dealer_values.append(new_card.value)
+
+
 
 
 mydeck = Deck()
 myplayer = Player(balance = 100)
+mydealer = Dealer()
 
 
 print('Welcome to BlackJack')
@@ -97,23 +97,23 @@ else:
     game_on = False
 
 
+mydeck.shuffle()
+
+top_card = mydeck.remove_card()
+
+myplayer.player_hit(top_card)
+
 def game_play():
     while game_on == True:
         myplayer.make_a_bet()
         break
 
-    mydeck.shuffle()
-
-    top_card = mydeck.remove_card()
-
-    myplayer.hit(top_card)
-
+    
     
 
     print(f"Your card is {myplayer.my_cards[0]}")
-    #current_value = myplayer.my_cards[0].value
-    #print(current_value)
-    while True:
+    players_turn = True
+    while players_turn == True:
         try:
             hit_choice = int(input("Would you like to hit? Enter 1 for Yes, 2 for No: "))
         except: 
@@ -121,7 +121,7 @@ def game_play():
         else:
             if hit_choice == 1:
                 top_card = mydeck.remove_card()
-                myplayer.hit(top_card)
+                myplayer.player_hit(top_card)
                 print(f"Your card is {myplayer.my_cards[-1]}") 
                 player_current_value = sum(myplayer.values)
                 print('your current hand value is ' + str(player_current_value))   
@@ -136,14 +136,42 @@ def game_play():
                     pass
                  
             else:
+                player_current_value = sum(myplayer.values)
+                print('your current hand value is ' + str(player_current_value))
                 print('It is now the dealers turn')
-                return player_current_value
+                
+                top_card = mydeck.remove_card()
+                mydealer.dealer_hit(top_card)
+                print(f"The dealer's card is {mydealer.dealer_cards[0]}")
+                dealer_wins = False
+                while dealer_wins == False:
+                    top_card = mydeck.remove_card()
+                    mydealer.dealer_hit(top_card)
+                    print(f"The dealer's card is {mydealer.dealer_cards[-1]}")
+                    dealer_current_value = sum(mydealer.dealer_values) 
+                    print('Dealers current hand value is ' + str(dealer_current_value))
+
+                    if dealer_current_value > 21:
+                        print('Dealer went over 21, you win!')
+                        dealer_wins = True
+                        players_turn = False
+                    elif dealer_current_value > player_current_value and dealer_current_value <= 21:
+                        print('dealer has higher hand, you lose.')
+                        dealer_wins = True
+                        players_turn = False
+                    else: 
+                        pass
+                        
+                        
+                        
+
+game_play()
+
     
-        
             
 
 
 
 
-game_play()
+
 
